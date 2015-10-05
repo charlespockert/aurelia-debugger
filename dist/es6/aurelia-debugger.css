@@ -1,0 +1,13 @@
+.debug-popup {
+	border: 1px solid gainsboro;
+	background: white;
+	z-index: 1000;
+	position: absolute;
+	box-shadow: 2px 2px 5px #bbbbbb;
+	padding: 8px;
+}
+
+.debug-element-highlight * {
+	color:red !important;
+	background-color: mistyrose !important;
+}
