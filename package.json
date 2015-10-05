@@ -5,11 +5,11 @@
   "keywords": [
     "aurelia",
     "plugin",
-    "skeleton"
+    "debugger"
   ],
   "homepage": "http://github.com/charlespockert",
   "bugs": {
-    "url": "https://github.com/charlespockert/aurelia-plugin-skeleton/issues"
+    "url": "https://github.com/charlespockert/aurelia-debugger/issues"
   },
   "license": "MIT",
   "author": "Charles Pockert <charles.pockert@googlemail.com>",
