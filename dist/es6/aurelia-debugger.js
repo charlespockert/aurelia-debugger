@@ -6,12 +6,15 @@ import './aurelia-debugger.css!';
 export class AureliaDebugger {
 
 	constructor(viewResources) {
+		this.popups = 0;
 		this.vr = viewResources;
 		this.vr.registerViewEngineHooks(this);		
 	}
 	
 	createDebugPopup(e, behaviors) {	
+
 		var popup = document.createElement("div");
+		this.popups++;
 		popup.classList.add("debug-popup");
 		
 		if(behaviors.constructor === Array) {
@@ -23,8 +26,8 @@ export class AureliaDebugger {
 			this.inspect(popup, behaviors);
 		}
 
-		popup.style.left = e.clientX + "px";
-		popup.style.top = e.clientY + "px";
+		popup.style.left = (e.clientX + 5 + (200 * this.popups)) + "px";
+		popup.style.top = (e.clientY + 5) + "px";
 
 		document.body.appendChild(popup);
 	
@@ -37,27 +40,47 @@ export class AureliaDebugger {
 
 		var ctx = behavior.bindingContext;
 		var hdr = document.createElement("p");
-		hdr.innerText = typeof(ctx);
+		hdr.innerText = behavior.behavior.apiName;
 		popup.appendChild(hdr);
 
 		this.createList(popup, ctx);
 	}
 
 	createList(popup, ctx) {
-		var ul = document.createElement("ul");
-		popup.appendChild(ul);
+		
+		this.propsToList(popup, ctx, 0);
 
-		for(var p in ctx) {
-
-			if(typeof(ctx[p]) !== "function") {
-				var li = document.createElement("li");
-				li.innerHTML = "<span class='prop'>" + p.toString() + "</span>: <span class='value'>" + ctx[p] + "</span>";
-				ul.appendChild(li);
-			}
-		}
 	}
 
+	propsToList(root, obj, lvl) {
+
+		lvl += 1;
+
+		if(lvl >= 2)
+			return;
+
+		// Write the UL for this object
+		
+	    if (obj) {
+			var ul = document.createElement("ul");
+			root.appendChild(ul);
+
+	        for (var key in obj) {
+	            if (typeof obj[key] != 'object' && typeof obj[key] != "function") {
+	            	var li = document.createElement("li");
+                    li.innerHTML = "<span class='prop'>"  + key + ":</span> " + obj[key];
+	    		    ul.appendChild(li);
+		        }
+
+	        }
+
+	    }
+
+	    return;
+	} 
+
 	destroyDebugPopup(popup) {
+		this.popups--;
 		popup.parentElement.removeChild(popup);
 	}
 
@@ -87,38 +110,4 @@ export class AureliaDebugger {
 			}
 		}
 	}
-}
-
-function shallowStringify(obj, onlyProps, skipTypes) {
-	var objType = typeof(obj);
-  	if(['function', 'undefined'].indexOf(objType) >= 0) {
-    	return objType;
-  	} else if(['string', 'number', 'boolean'].indexOf(objType) >= 0) {
-    	return obj; // will toString
-  	}
-
-	var res = '{';
-  	for (var p in obj) { // property in object
-    	if(typeof(onlyProps)!=='undefined' && onlyProps) {
-	    // Only show property names as values may show too much noise.
-	    // After this you can trace more specific properties to debug
-	    res += p +', ';
-    
-    	} else {
-	    	var valType = typeof(obj[p]);
-	      	
-	      	if(typeof(skipTypes) == 'undefined') {
-	        	skipTypes = ['function'];
-	      	}
-
-	      	if(skipTypes.indexOf(valType) >= 0) {
-	        	res += p + ': ' + valType + ', ';
-	      	} else {
-	        	res += p + ': ' + obj[p] + ', ';
-      		}
-    	}
-  	}
-  	res += '}';
-  	
-  	return res;
 }
