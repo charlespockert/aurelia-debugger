@@ -66,14 +66,21 @@ export class AureliaDebugger {
 			root.appendChild(ul);
 
 	        for (var key in obj) {
-	            if (typeof obj[key] != 'object' && typeof obj[key] != "function") {
+	            
+	           
+	            if(typeof obj[key] == 'object') {
+	            	// Recurse
+	            	var li = document.createElement("li");
+            		li.innerHTML = "<span class='prop'>"  + key + ":</span> " + obj[key];
+	    		    ul.appendChild(li);
+	            }
+	            else if (typeof obj[key] != "function") {
 	            	var li = document.createElement("li");
                     li.innerHTML = "<span class='prop'>"  + key + ":</span> " + obj[key];
 	    		    ul.appendChild(li);
 		        }
 
 	        }
-
 	    }
 
 	    return;

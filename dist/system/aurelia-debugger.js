@@ -18,7 +18,7 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 				function AureliaDebugger(viewResources) {
 					_classCallCheck(this, _AureliaDebugger);
 
-					this.popups = 0;
+					this.popup = undefined;
 					this.vr = viewResources;
 					this.vr.registerViewEngineHooks(this);
 				}
@@ -27,24 +27,30 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 					key: 'createDebugPopup',
 					value: function createDebugPopup(e, behaviors) {
 
-						var popup = document.createElement("div");
-						this.popups++;
+						this.popup = this.popup || document.createElement("div");
+
+						var popup = this.popup;
+
 						popup.classList.add("debug-popup");
+
+						var section = document.createElement("div");
 
 						if (behaviors.constructor === Array) {
 							for (var i = 0; i < behaviors.length; i++) {
-								this.inspect(popup, behaviors[i]);
+								this.inspect(section, behaviors[i]);
 							}
 						} else {
-							this.inspect(popup, behaviors);
+							this.inspect(section, behaviors);
 						}
+
+						popup.appendChild(section);
 
 						popup.style.left = e.clientX + 5 + 200 * this.popups + "px";
 						popup.style.top = e.clientY + 5 + "px";
 
 						document.body.appendChild(popup);
 
-						return popup;
+						return section;
 					}
 				}, {
 					key: 'inspect',
@@ -78,7 +84,12 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 							root.appendChild(ul);
 
 							for (var key in obj) {
-								if (typeof obj[key] != 'object' && typeof obj[key] != "function") {
+
+								if (typeof obj[key] == 'object') {
+									var li = document.createElement("li");
+									li.innerHTML = "<span class='prop'>" + key + ":</span> " + obj[key];
+									ul.appendChild(li);
+								} else if (typeof obj[key] != "function") {
 									var li = document.createElement("li");
 									li.innerHTML = "<span class='prop'>" + key + ":</span> " + obj[key];
 									ul.appendChild(li);
@@ -93,6 +104,11 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 					value: function destroyDebugPopup(popup) {
 						this.popups--;
 						popup.parentElement.removeChild(popup);
+
+						if (this.popup.children.length == 0) {
+							this.popup.parentElement.removeChild(this.popup);
+							this.popup = undefined;
+						}
 					}
 				}, {
 					key: 'afterCreate',
@@ -103,18 +119,18 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 						var fec = f.firstElementChild;
 
 						if (fec) {
-							var popup = null;
+							var section = null;
 							var ctx = view.behaviors.length > 0 ? view.behaviors : view.bindingContext;
 
 							if (ctx) {
 								fec.onmouseenter = function (e) {
 									fec.classList.add("debug-element-highlight");
-									popup = _this.createDebugPopup(e, ctx);
+									section = _this.createDebugPopup(e, ctx);
 								};
 
 								fec.onmouseleave = function (e) {
 									fec.classList.remove("debug-element-highlight");
-									_this.destroyDebugPopup(popup);
+									_this.destroyDebugPopup(section);
 								};
 
 								fec.onclick = function (e) {
