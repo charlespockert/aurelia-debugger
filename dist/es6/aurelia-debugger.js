@@ -6,32 +6,39 @@ import './aurelia-debugger.css!';
 export class AureliaDebugger {
 
 	constructor(viewResources) {
-		this.popups = 0;
+		this.popup = undefined;
 		this.vr = viewResources;
 		this.vr.registerViewEngineHooks(this);		
 	}
 	
 	createDebugPopup(e, behaviors) {	
 
-		var popup = document.createElement("div");
-		this.popups++;
-		popup.classList.add("debug-popup");
+		this.popup = this.popup || document.createElement("div");
 		
+		var popup = this.popup;
+
+		popup.classList.add("debug-popup");
+
+		// Add a div to the popup for this inspection
+		var section = document.createElement("div");
+
 		if(behaviors.constructor === Array) {
 			for(var i = 0; i < behaviors.length; i++) {
-				this.inspect(popup, behaviors[i]);
+				this.inspect(section, behaviors[i]);
 			}
 		} 
 		else {
-			this.inspect(popup, behaviors);
+			this.inspect(section, behaviors);
 		}
 
+		popup.appendChild(section);
+		
 		popup.style.left = (e.clientX + 5 + (200 * this.popups)) + "px";
 		popup.style.top = (e.clientY + 5) + "px";
 
 		document.body.appendChild(popup);
 	
-		return popup;
+		return section;
 	}
 
 	inspect(popup, behavior) {
@@ -89,6 +96,11 @@ export class AureliaDebugger {
 	destroyDebugPopup(popup) {
 		this.popups--;
 		popup.parentElement.removeChild(popup);
+
+		if(this.popup.children.length == 0){
+			this.popup.parentElement.removeChild(this.popup);
+			this.popup = undefined;
+		}
 	}
 
 	afterCreate(view) {
@@ -96,18 +108,18 @@ export class AureliaDebugger {
 		var fec = f.firstElementChild;
 
 		if(fec) {
-			var popup = null;
+			var section = null;
 			var ctx = view.behaviors.length > 0 ? view.behaviors : view.bindingContext;
 		
 			if(ctx) {	
 				fec.onmouseenter = (e) => {
 					fec.classList.add("debug-element-highlight");
-					popup = this.createDebugPopup(e, ctx);
+					section = this.createDebugPopup(e, ctx);
 				}
 
 				fec.onmouseleave = (e) => {
 					fec.classList.remove("debug-element-highlight");
-					this.destroyDebugPopup(popup);
+					this.destroyDebugPopup(section);
 				}
 
 				fec.onclick = (e) => {

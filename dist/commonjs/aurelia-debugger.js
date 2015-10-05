@@ -16,7 +16,7 @@ var AureliaDebugger = (function () {
 	function AureliaDebugger(viewResources) {
 		_classCallCheck(this, _AureliaDebugger);
 
-		this.popups = 0;
+		this.popup = undefined;
 		this.vr = viewResources;
 		this.vr.registerViewEngineHooks(this);
 	}
@@ -25,24 +25,30 @@ var AureliaDebugger = (function () {
 		key: 'createDebugPopup',
 		value: function createDebugPopup(e, behaviors) {
 
-			var popup = document.createElement("div");
-			this.popups++;
+			this.popup = this.popup || document.createElement("div");
+
+			var popup = this.popup;
+
 			popup.classList.add("debug-popup");
+
+			var section = document.createElement("div");
 
 			if (behaviors.constructor === Array) {
 				for (var i = 0; i < behaviors.length; i++) {
-					this.inspect(popup, behaviors[i]);
+					this.inspect(section, behaviors[i]);
 				}
 			} else {
-				this.inspect(popup, behaviors);
+				this.inspect(section, behaviors);
 			}
+
+			popup.appendChild(section);
 
 			popup.style.left = e.clientX + 5 + 200 * this.popups + "px";
 			popup.style.top = e.clientY + 5 + "px";
 
 			document.body.appendChild(popup);
 
-			return popup;
+			return section;
 		}
 	}, {
 		key: 'inspect',
@@ -96,6 +102,11 @@ var AureliaDebugger = (function () {
 		value: function destroyDebugPopup(popup) {
 			this.popups--;
 			popup.parentElement.removeChild(popup);
+
+			if (this.popup.children.length == 0) {
+				this.popup.parentElement.removeChild(this.popup);
+				this.popup = undefined;
+			}
 		}
 	}, {
 		key: 'afterCreate',
@@ -106,18 +117,18 @@ var AureliaDebugger = (function () {
 			var fec = f.firstElementChild;
 
 			if (fec) {
-				var popup = null;
+				var section = null;
 				var ctx = view.behaviors.length > 0 ? view.behaviors : view.bindingContext;
 
 				if (ctx) {
 					fec.onmouseenter = function (e) {
 						fec.classList.add("debug-element-highlight");
-						popup = _this.createDebugPopup(e, ctx);
+						section = _this.createDebugPopup(e, ctx);
 					};
 
 					fec.onmouseleave = function (e) {
 						fec.classList.remove("debug-element-highlight");
-						_this.destroyDebugPopup(popup);
+						_this.destroyDebugPopup(section);
 					};
 
 					fec.onclick = function (e) {
