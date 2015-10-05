@@ -7,7 +7,11 @@
 	padding: 8px;
 }
 
+.debug-popup .prop {
+	font-weight: bold;
+}
+
 .debug-element-highlight * {
-	color:red !important;
 	background-color: mistyrose !important;
 }
+

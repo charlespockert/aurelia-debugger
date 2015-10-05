@@ -6,31 +6,81 @@ import './aurelia-debugger.css!';
 export class AureliaDebugger {
 
 	constructor(viewResources) {
+		this.popups = 0;
 		this.vr = viewResources;
 		this.vr.registerViewEngineHooks(this);		
 	}
 	
-	createDebugPopup(e, ctx) {	
+	createDebugPopup(e, behaviors) {	
+
 		var popup = document.createElement("div");
+		this.popups++;
 		popup.classList.add("debug-popup");
 		
-		try {
-			var json = shallowStringify(ctx);
-   		}
-	   	catch(err) {
-	   		var json = "Error serializing object: " + err;
+		if(behaviors.constructor === Array) {
+			for(var i = 0; i < behaviors.length; i++) {
+				this.inspect(popup, behaviors[i]);
+			}
+		} 
+		else {
+			this.inspect(popup, behaviors);
 		}
 
-   		popup.innerHTML = json;
-		popup.style.left = e.clientX + "px";
-		popup.style.top = e.clientY + "px";
+		popup.style.left = (e.clientX + 5 + (200 * this.popups)) + "px";
+		popup.style.top = (e.clientY + 5) + "px";
 
 		document.body.appendChild(popup);
 	
 		return popup;
 	}
 
+	inspect(popup, behavior) {
+
+		if(!behavior.bindingContext) return;
+
+		var ctx = behavior.bindingContext;
+		var hdr = document.createElement("p");
+		hdr.innerText = behavior.behavior.apiName;
+		popup.appendChild(hdr);
+
+		this.createList(popup, ctx);
+	}
+
+	createList(popup, ctx) {
+		
+		this.propsToList(popup, ctx, 0);
+
+	}
+
+	propsToList(root, obj, lvl) {
+
+		lvl += 1;
+
+		if(lvl >= 2)
+			return;
+
+		// Write the UL for this object
+		
+	    if (obj) {
+			var ul = document.createElement("ul");
+			root.appendChild(ul);
+
+	        for (var key in obj) {
+	            if (typeof obj[key] != 'object' && typeof obj[key] != "function") {
+	            	var li = document.createElement("li");
+                    li.innerHTML = "<span class='prop'>"  + key + ":</span> " + obj[key];
+	    		    ul.appendChild(li);
+		        }
+
+	        }
+
+	    }
+
+	    return;
+	} 
+
 	destroyDebugPopup(popup) {
+		this.popups--;
 		popup.parentElement.removeChild(popup);
 	}
 
@@ -40,7 +90,7 @@ export class AureliaDebugger {
 
 		if(fec) {
 			var popup = null;
-			var ctx = view.behaviors.length > 0 ? view.behaviors[0].bindingContext : undefined;
+			var ctx = view.behaviors.length > 0 ? view.behaviors : view.bindingContext;
 		
 			if(ctx) {	
 				fec.onmouseenter = (e) => {
@@ -60,38 +110,4 @@ export class AureliaDebugger {
 			}
 		}
 	}
-}
-
-function shallowStringify(obj, onlyProps, skipTypes) {
-	var objType = typeof(obj);
-  	if(['function', 'undefined'].indexOf(objType) >= 0) {
-    	return objType;
-  	} else if(['string', 'number', 'boolean'].indexOf(objType) >= 0) {
-    	return obj; // will toString
-  	}
-
-	var res = '{';
-  	for (var p in obj) { // property in object
-    	if(typeof(onlyProps)!=='undefined' && onlyProps) {
-	    // Only show property names as values may show too much noise.
-	    // After this you can trace more specific properties to debug
-	    res += p +', ';
-    
-    	} else {
-	    	var valType = typeof(obj[p]);
-	      	
-	      	if(typeof(skipTypes) == 'undefined') {
-	        	skipTypes = ['function'];
-	      	}
-
-	      	if(skipTypes.indexOf(valType) >= 0) {
-	        	res += p + ': ' + valType + ', ';
-	      	} else {
-	        	res += p + ': ' + obj[p] + ', ';
-      		}
-    	}
-  	}
-  	res += '}';
-  	
-  	return res;
 }

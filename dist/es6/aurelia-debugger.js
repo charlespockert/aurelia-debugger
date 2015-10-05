@@ -10,24 +10,51 @@ export class AureliaDebugger {
 		this.vr.registerViewEngineHooks(this);		
 	}
 	
-	createDebugPopup(e, ctx) {	
+	createDebugPopup(e, behaviors) {	
 		var popup = document.createElement("div");
 		popup.classList.add("debug-popup");
 		
-		try {
-			var json = shallowStringify(ctx);
-   		}
-	   	catch(err) {
-	   		var json = "Error serializing object: " + err;
+		if(behaviors.constructor === Array) {
+			for(var i = 0; i < behaviors.length; i++) {
+				this.inspect(popup, behaviors[i]);
+			}
+		} 
+		else {
+			this.inspect(popup, behaviors);
 		}
 
-   		popup.innerHTML = json;
 		popup.style.left = e.clientX + "px";
 		popup.style.top = e.clientY + "px";
 
 		document.body.appendChild(popup);
 	
 		return popup;
+	}
+
+	inspect(popup, behavior) {
+
+		if(!behavior.bindingContext) return;
+
+		var ctx = behavior.bindingContext;
+		var hdr = document.createElement("p");
+		hdr.innerText = typeof(ctx);
+		popup.appendChild(hdr);
+
+		this.createList(popup, ctx);
+	}
+
+	createList(popup, ctx) {
+		var ul = document.createElement("ul");
+		popup.appendChild(ul);
+
+		for(var p in ctx) {
+
+			if(typeof(ctx[p]) !== "function") {
+				var li = document.createElement("li");
+				li.innerHTML = "<span class='prop'>" + p.toString() + "</span>: <span class='value'>" + ctx[p] + "</span>";
+				ul.appendChild(li);
+			}
+		}
 	}
 
 	destroyDebugPopup(popup) {
@@ -40,7 +67,7 @@ export class AureliaDebugger {
 
 		if(fec) {
 			var popup = null;
-			var ctx = view.behaviors.length > 0 ? view.behaviors[0].bindingContext : undefined;
+			var ctx = view.behaviors.length > 0 ? view.behaviors : view.bindingContext;
 		
 			if(ctx) {	
 				fec.onmouseenter = (e) => {
