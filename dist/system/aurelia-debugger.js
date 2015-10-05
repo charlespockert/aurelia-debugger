@@ -21,9 +21,11 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 				res += p + ', ';
 			} else {
 				var valType = typeof obj[p];
+
 				if (typeof skipTypes == 'undefined') {
 					skipTypes = ['function'];
 				}
+
 				if (skipTypes.indexOf(valType) >= 0) {
 					res += p + ': ' + valType + ', ';
 				} else {
@@ -32,6 +34,7 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 			}
 		}
 		res += '}';
+
 		return res;
 	}
 	return {

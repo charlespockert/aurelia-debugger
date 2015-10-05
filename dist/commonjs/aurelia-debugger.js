@@ -27,13 +27,12 @@ var AureliaDebugger = (function () {
 			popup.classList.add("debug-popup");
 
 			try {
-				var json = JSON.stringify(ctx, handleCircularRefs, 4);
+				var json = shallowStringify(ctx);
 			} catch (err) {
 				var json = "Error serializing object: " + err;
 			}
 
 			popup.innerHTML = json;
-			popup.style.position = 'absolute';
 			popup.style.left = e.clientX + "px";
 			popup.style.top = e.clientY + "px";
 
@@ -68,6 +67,11 @@ var AureliaDebugger = (function () {
 						fec.classList.remove("debug-element-highlight");
 						_this.destroyDebugPopup(popup);
 					};
+
+					fec.onclick = function (e) {
+						console.log("Dumping context for '" + fec.localName + "'");
+						console.log(ctx);
+					};
 				}
 			}
 		}
@@ -81,10 +85,33 @@ var AureliaDebugger = (function () {
 
 exports.AureliaDebugger = AureliaDebugger;
 
-function handleCircularRefs(key, value) {
-	if (key == 'parent') {
-		return value.id;
-	} else {
-		return value;
+function shallowStringify(obj, onlyProps, skipTypes) {
+	var objType = typeof obj;
+	if (['function', 'undefined'].indexOf(objType) >= 0) {
+		return objType;
+	} else if (['string', 'number', 'boolean'].indexOf(objType) >= 0) {
+		return obj;
 	}
+
+	var res = '{';
+	for (var p in obj) {
+		if (typeof onlyProps !== 'undefined' && onlyProps) {
+			res += p + ', ';
+		} else {
+			var valType = typeof obj[p];
+
+			if (typeof skipTypes == 'undefined') {
+				skipTypes = ['function'];
+			}
+
+			if (skipTypes.indexOf(valType) >= 0) {
+				res += p + ': ' + valType + ', ';
+			} else {
+				res += p + ': ' + obj[p] + ', ';
+			}
+		}
+	}
+	res += '}';
+
+	return res;
 }
