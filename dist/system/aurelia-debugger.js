@@ -45,7 +45,7 @@ System.register(['aurelia-framework', './aurelia-debugger.css!'], function (_exp
 
 						popup.appendChild(section);
 
-						popup.style.left = e.clientX + 5 + 200 * this.popups + "px";
+						popup.style.left = e.clientX + 5 + "px";
 						popup.style.top = e.clientY + 5 + "px";
 
 						document.body.appendChild(popup);
