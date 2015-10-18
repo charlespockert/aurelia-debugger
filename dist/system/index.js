@@ -1,14 +1,24 @@
-System.register([], function (_export) {
-	'use strict';
+System.register(['./dom-tracker', './create-window'], function (_export) {
+  'use strict';
 
-	_export('configure', configure);
+  var DomTracker, CreateWindow;
 
-	function configure(aurelia) {
-		aurelia.globalResources('./aurelia-debugger');
-	}
+  _export('configure', configure);
 
-	return {
-		setters: [],
-		execute: function () {}
-	};
+  function configure(aurelia) {
+    aurelia.container.get(DomTracker);
+
+    aurelia.container.get(CreateWindow);
+
+    aurelia.globalResources('./debug-window');
+  }
+
+  return {
+    setters: [function (_domTracker) {
+      DomTracker = _domTracker.DomTracker;
+    }, function (_createWindow) {
+      CreateWindow = _createWindow.CreateWindow;
+    }],
+    execute: function () {}
+  };
 });

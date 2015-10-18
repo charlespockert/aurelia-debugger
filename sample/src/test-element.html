@@ -1,4 +1,10 @@
 <template>
-	<p>This is a test element</p>
+	<p click.delegate="testClick($event)">This is a test element</p>
 	<p>This is its value: ${ value }</p>
+
+	<ul>
+		<li repeat.for="number of numbers">
+			ix: ${ $index } = ${ number }
+		</li>
+	</ul>
 </template>

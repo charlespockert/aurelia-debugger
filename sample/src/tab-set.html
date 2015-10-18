@@ -1,0 +1,8 @@
+<template>
+	<ul class="nav nav-tabs">
+	    <li role="presentation" click.delegate="$parent.selectTab(tab)" repeat.for="tab of tabs" class="${ $parent.selectedTab === tab ? 'active' : '' }"><a href="#">${ tab.heading }</a></li>
+	</ul>
+	<div style="margin-top:8px">
+	    <content></content>
+	</div>
+</template>

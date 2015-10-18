@@ -1,12 +1,16 @@
-define(['exports'], function (exports) {
-	'use strict';
+define(['exports', './dom-tracker', './create-window'], function (exports, _domTracker, _createWindow) {
+  'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	exports.configure = configure;
+  Object.defineProperty(exports, '__esModule', {
+    value: true
+  });
+  exports.configure = configure;
 
-	function configure(aurelia) {
-		aurelia.globalResources('./aurelia-debugger');
-	}
+  function configure(aurelia) {
+    aurelia.container.get(_domTracker.DomTracker);
+
+    aurelia.container.get(_createWindow.CreateWindow);
+
+    aurelia.globalResources('./debug-window');
+  }
 });

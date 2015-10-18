@@ -1,4 +1,23 @@
 <template>
+	<require from="./tab-set"></require>
+	<require from="./tab"></require>
  	<require from="./test-element"></require>
     <test-element value="Hello World"></test-element>
+
+  <!-- Some view model... -->
+  <tab-set>
+    <tab heading="Tab 1">
+      <p>Hello world!</p>
+    </tab>
+    <tab heading="Tab 2">
+      <tab-set>
+	    <tab heading="Nested tab 1">
+	      <p>This is nested</p>
+	    </tab>
+	    <tab heading="Nested tab 2">
+	      <p>This is nested</p>
+	    </tab>
+	  </tab-set>
+    </tab>
+  </tab-set>
 </template>

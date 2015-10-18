@@ -1,0 +1,61 @@
+.debug-popup {
+	border: 1px solid gainsboro;
+	min-width: 400px;
+	background: white;
+	z-index: 1000;
+	position: absolute;
+	box-shadow: 2px 2px 5px #bbbbbb;
+	padding: 8px;
+	border-radius: 5px;
+}
+
+.debug-popup .prop {
+	font-weight: bold;
+}
+
+.debug-element-highlight * {
+	background-color: mistyrose !important;
+}
+
+
+.debug-popup h1 {
+    border-bottom: 1px solid gainsboro;
+    margin: 0px;
+    padding-bottom: 4px;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+.debug-popup .view-hints {
+	position: relative;
+    display: block;
+    padding: 0px;
+    background-color: #fff;
+    margin-bottom: 10px;
+}
+
+.debug-popup .view-hints li {
+    border: 1px solid #ddd;
+    border-bottom: none;
+    padding: 4px;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.debug-popup .view-hints li:first-child {
+	background-color: #888;
+	color: white;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.debug-popup .view-hints li:last-child {
+	border-bottom: 1px solid #ddd;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.debug-popup .view-hints li {	
+    display: block;
+    list-style-type: disc;
+}

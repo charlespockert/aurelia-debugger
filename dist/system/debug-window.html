@@ -1,0 +1,22 @@
+<template>
+	<require from="./debug-window.css"></require>
+	<div class="debug-popup" show.bind="visible">
+		<h1>Context Inspector - CTRL + / to toggle</h1>
+		<div>
+			<p>Press CTRL + . (full stop) to dump to console</p>
+			<ul repeat.for="view of tracker.tracked" class="view-hints">
+				<li>
+					<span>
+						<strong>Item ${ $index + 1 }, View:</strong> &lt;${ $parent.getElementName(view) }&gt;
+					</span>
+					<span>
+						<strong>ViewModel:</strong> ${ $parent.getConstructorName(view) }
+					</span>		
+				</li>
+				<li if.bind="view.behaviors.length > 0">
+					<strong>Attached behaviours:</strong> <span repeat.for="b of view.behaviors">${ b.behavior.apiName }<span if.bind="!$last">, </span></span>
+				</li>
+			</ul>
+		</div>
+	</div>
+</template>
