@@ -14,8 +14,8 @@ export function configure(aurelia) {
   aurelia.use
     .standardConfiguration()
     // Add plugin here
-    .plugin('aurelia-debugger');
-    
+    .plugin('charlespockert/aurelia-debugger');
+  
   aurelia.start().then(a => a.setRoot('app'));
 }
 ```
